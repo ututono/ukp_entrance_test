@@ -8,6 +8,9 @@ class DataProcessor():
         self.shuffle = shuffle
         self.num_workers = num_workers
 
+    def load_embedding(self):
+        raise NotImplementedError
+
     def load_raw_data(self):
         raise NotImplementedError
 
