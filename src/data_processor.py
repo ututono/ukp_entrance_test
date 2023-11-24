@@ -45,13 +45,13 @@ class DataProcessor:
         self._shuffle = shuffle
         self._num_workers = num_workers
         self.EMBEDDING_DIM = get_embedding_dim()
-        self.vocab = None
-        self.labels = None
+        self._vocab = None
+        self._labels = None
         self._label2index = None  # Mapping from label to index
         self._vectorize_word = vectorize if vectorize else self.default_vectorize_word
         self._dtype = dtype
         self._tensor_type = torch.long
-        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu") if device is None else device
+        self._device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu") if device is None else device
 
         # Initialize vocab and labels
         self._init_vocab()
@@ -72,14 +72,14 @@ class DataProcessor:
 
         alpha = list(x_data.keys())
 
-        self.vocab = {w: i + 1 for i, w in enumerate(alpha)}
+        self._vocab = {w: i + 1 for i, w in enumerate(alpha)}
         for tag in NEGLECT_TAGS:
             if tag in self.vocab:
                 self.vocab[tag] = 0
 
-        self.labels = list(y_target.keys())
+        self._labels = list(y_target.keys())
 
-        label2index = {l: i + 1 for i, l in enumerate(self.labels)}
+        label2index = {l: i + 1 for i, l in enumerate(self._labels)}
         label2index['PAD'] = 0
         self._label2index = label2index
 
@@ -117,9 +117,9 @@ class DataProcessor:
             label_vec = self._vectorize_label_set(labels)
             words_vec = self._vectorize_word(sent)
             sent_length = len(sent)
-            sentences_lengths.append(torch.tensor(sent_length, dtype=self._tensor_type, device=self.device))
-            sentences_tensors.append(torch.tensor(words_vec, dtype=self._tensor_type, device=self.device))
-            labels_tensors.append(torch.tensor(label_vec, dtype=self._tensor_type, device=self.device))
+            sentences_lengths.append(torch.tensor(sent_length, dtype=self._tensor_type, device=self._device))
+            sentences_tensors.append(torch.tensor(words_vec, dtype=self._tensor_type, device=self._device))
+            labels_tensors.append(torch.tensor(label_vec, dtype=self._tensor_type, device=self._device))
 
         sentences_lengths = torch.stack(sentences_lengths)
         x_tensor = torch.nn.utils.rnn.pad_sequence(sentences_tensors, batch_first=True)
@@ -136,9 +136,6 @@ class DataProcessor:
     def _vectorize_label_set(self, labels: List[str]):
         return list(self._label2index.get(label) for label in labels)
 
-    def _embed_data(self, data_df: pd.DataFrame):
-        raise NotImplementedError
-
     def _load_raw_data(self):
         for filename in [TRAIN_FILENAME, DEV_FILENAME, TEST_FILENAME]:
             df = read_csv_file(os.path.join(self._data_dir, filename), DATA_OPT)
@@ -148,3 +145,7 @@ class DataProcessor:
         for attr in attribute_names:
             if getattr(self, attr) is None:
                 raise ValueError(f"The attribute {attr} is None")
+
+    @property
+    def vocab(self):
+        return self._vocab

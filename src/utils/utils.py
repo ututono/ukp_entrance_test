@@ -12,6 +12,10 @@ def root_path():
     return get_parent_path(os.path.abspath(__file__), 3)
 
 
+def embedding_path():
+    return os.path.join(root_path(), "pretrained", "glove.6B.50d.txt")
+
+
 def get_parent_path(path, levels=1):
     """
     Returns the parent folder path of a given path, up a certain number of levels.
@@ -27,14 +31,14 @@ def get_parent_path(path, levels=1):
 
 def embed_vocab(embed_path: str, vocab, uniform_bounding=0.25):
     """
-
+    Embedding the vocabulary using the pretrained embeddings
     :param embed_path:
-    :param vocab:
+    :param vocab: dict. Mapping from word to index
     :param uniform_bounding:
-    :return: torch.nn.Embedding, embedding_dim
+    :return: torch.nn.Embedding
     """
 
-    def init_embeddings(vocab_size, embedding_dim, bounding):
+    def init_embeddings_weight(vocab_size, embedding_dim, bounding):
         """Initializing neural network weights randomly"""
         return np.random.uniform(-bounding, bounding, (vocab_size, embedding_dim))
 
@@ -42,11 +46,13 @@ def embed_vocab(embed_path: str, vocab, uniform_bounding=0.25):
         lines = f.readlines()
         embed_dim = len(lines[0].strip().split()) - 1
 
-        weights = init_embeddings(len(lines), embed_dim, uniform_bounding)
+        weights = init_embeddings_weight(len(lines), embed_dim, uniform_bounding)
 
+        # According to the pretrained embedding lookup table, the embedding of the words in the vocabulary(existing in the provided dataset) to the weights
         for line in lines:
             word, *vector = line.strip().split()
-            weights[vocab[word]] = np.array(vector, dtype=np.float32)
+            if word in vocab:
+                weights[vocab[word]] = np.array(vector, dtype=np.float32)
 
     # Set padding tag to zero
     for padding_tag in NEGLECT_TAGS:
@@ -56,11 +62,11 @@ def embed_vocab(embed_path: str, vocab, uniform_bounding=0.25):
     embeddings = nn.Embedding(num_embeddings=weights.shape[0], embedding_dim=weights.shape[1])
     embeddings.weight = nn.Parameter(torch.from_numpy(weights))
 
-    return embeddings, weights.shape[1]
+    return embeddings
 
 
 def get_embedding_dim(embed_path: str = None):
-    embed_path = embed_path if embed_path else os.path.join(root_path(), "pretrained", "glove.6B.50d.txt")
+    embed_path = embed_path if embed_path else embedding_path()
     check_path_exists(embed_path)
     with open(embed_path, 'r') as f:
         lines = f.readline()  # One line is enough
