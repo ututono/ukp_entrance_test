@@ -5,7 +5,7 @@ from torch import nn
 import numpy as np
 import torch
 
-from src.utils.global_variables import ENCODING, NEGLECT_TAGS, DATA_COL_NAMES
+from src.utils.global_variables import ENCODING, NEGLECT_TAGS, DATA_COL_NAMES, START_TAG, STOP_TAG
 
 
 def root_path():
@@ -86,9 +86,26 @@ def read_csv_file(file_path: str, option: str):
     :param option: str. ["data-conll"]
     :return:
     """
+    check_path_exists(file_path)
     if option == "data-conll":
         df = pd.read_csv(file_path, delimiter='\t', encoding=ENCODING, names=DATA_COL_NAMES, skiprows=[0])
         df = df.dropna()
     else:
         raise ValueError("The option is invalid")
     return df
+
+
+def get_label2index(labels):
+    """
+    Get the mapping from label to index
+    :param labels: list of labels
+    :return: dict. Mapping from label to index
+    """
+    # map the NEG tag to the number
+    label2index = {l: i + 1 for i, l in enumerate(labels)}
+    for tag in NEGLECT_TAGS:
+        if tag in label2index:
+            label2index[tag] = 0
+    label2index[START_TAG] = len(labels) + 1
+    label2index[STOP_TAG] = len(labels) + 2
+    return label2index

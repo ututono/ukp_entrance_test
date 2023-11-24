@@ -10,7 +10,7 @@ from torch.utils.data import DataLoader, TensorDataset
 
 from src.utils.global_variables import TEST_FILENAME, TRAIN_FILENAME, DEV_FILENAME, ENCODING, DATA_COL_NAMES, WORD_COL, \
     NER_COL, NEGLECT_TAGS, ENDING_PUNCTUATIONS, DATA_OPT
-from src.utils.utils import root_path, get_embedding_dim, read_csv_file
+from src.utils.utils import root_path, get_embedding_dim, read_csv_file, get_label2index
 from src.utils.basic_logger import setup_logger
 
 logger = setup_logger(__name__, level='DEBUG')
@@ -79,8 +79,8 @@ class DataProcessor:
 
         self._labels = list(y_target.keys())
 
-        label2index = {l: i + 1 for i, l in enumerate(self._labels)}
-        label2index['PAD'] = 0
+        label2index = get_label2index(self._labels)
+
         self._label2index = label2index
 
     def load_embedding(self):
