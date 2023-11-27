@@ -7,7 +7,7 @@ from src.utils_.confusion_matrix import ConfusionMatrix
 from src.utils_.basic_logger import setup_logger
 from src.utils_.global_variables import LOGGING_LEVEL
 from src.utils_.utils import extract_valid_labels, transfer_set_tensors_to_numpy, convert_milliseconds_to_hms, \
-    convert_second_to_hms
+    convert_second_to_hms, permute_sequence_by_length
 
 logger = setup_logger(__name__, level=LOGGING_LEVEL)
 
@@ -44,8 +44,7 @@ class Trainer:
         :param device: device to train on
         :return:
         """
-        model = model.to(device)
-        self._train_vanilla_model(model, train_dataloader, dev_dataloader, optimizer, loss_function, epochs, labels,
+        self._train_vanilla_model(model.to(device), train_dataloader, dev_dataloader, optimizer, loss_function, epochs, labels,
                                   device)
 
     def _train_vanilla_model(self, model, train_dataloader, dev_dataloader, optimizer, loss_function, epochs, labels,
@@ -104,14 +103,15 @@ class Trainer:
         batch_size = features.shape[0]
 
         # Sort the features and labels by their length, the longest first in this batch
-        sent_lengths, perm_idx = sent_lengths.sort(0, descending=True)
-        features_sorted = features[perm_idx]
+        features_sorted, sent_lengths, perm_idx = permute_sequence_by_length(features, sent_lengths)
         labels_sorted = labels[perm_idx]
+        # sent_lengths, perm_idx = sent_lengths.sort(0, descending=True)
+        # features_sorted = features[perm_idx]
+        # labels_sorted = labels[perm_idx]
 
         y_ = labels_sorted.to(device)
         x_ = (features_sorted.to(device), sent_lengths.to(device))
 
-        # Used for confusion matrix calculation
         tags_scores, tags_scores_lengths = model(x_)
 
         # Remove padding from prediction, only use valid labels for loss calculation

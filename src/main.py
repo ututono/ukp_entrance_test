@@ -8,7 +8,7 @@ from src.model import VanillaBiLSTMTagger
 from src.trainer import Trainer
 from src.utils_.global_variables import SEED, DATA_DIR_NAME, TRAIN_FILENAME, DEV_FILENAME, MODEL_NAME, TRAIN_CONFIG_NAME, LOGGING_LEVEL
 from src.utils_.utils import root_path, seed_random_generators, embedding_path, get_embedding_dim, embed_vocab, \
-    create_ckpt_dir, get_train_params, update_train_params, dict2json
+    get_ckpt_dir, get_train_params, update_train_params, dict2json
 from src.settings import parse_arguments
 from src.utils_.basic_logger import setup_logger
 
@@ -60,7 +60,7 @@ def pipeline_train(train_params):
                   device)
 
     # Create checkpoint directory and save it to train_params
-    ckpt_dir = create_ckpt_dir(date_time=datetime.now())
+    ckpt_dir = get_ckpt_dir(date_time=datetime.now())
     update_train_params(train_params, checkpoint=ckpt_dir, device=device)
 
     # Save model and training parameters

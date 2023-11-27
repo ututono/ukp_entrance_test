@@ -6,6 +6,7 @@ import os
 
 import src.utils_.utils as utils
 from src.data_processor import DataProcessor
+from src.utils_.global_variables import OUTPUT_DIR_NAME
 from src.utils_.utils import root_path, embedding_path
 
 DATA_DIR_NAME = 'data'
@@ -47,6 +48,10 @@ class UtilsTestCase(unittest.TestCase):
         self.assertAlmostEqual(elapsed_time, SLEEP_TIME, delta=1)
         date_time = utils.convert_second_to_hms(elapsed_time)
         self.assertEqual("Elapsed time: 0h:0m:1s", f"Elapsed time: {date_time[0]}h:{date_time[1]}m:{date_time[2]}s")
+
+    def test_get_ckpt_dir(self):
+        mock_ckpt_dir = os.path.join(root_path(), OUTPUT_DIR_NAME, 'checkpoints', '2023_11_27-17_16_04')
+        self.assertEqual(mock_ckpt_dir, utils.get_ckpt_dir(date_time='2023_11_27-17_16_04'))
 
 
 if __name__ == '__main__':

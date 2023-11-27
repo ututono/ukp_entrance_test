@@ -8,7 +8,8 @@ import numpy as np
 import torch
 import random
 
-from src.utils_.global_variables import ENCODING, NEGLECT_TAGS, DATA_COL_NAMES, START_TAG, STOP_TAG, SEED
+from src.utils_.global_variables import ENCODING, NEGLECT_TAGS, DATA_COL_NAMES, START_TAG, STOP_TAG, SEED, \
+    OUTPUT_DIR_NAME
 
 
 def root_path():
@@ -109,13 +110,16 @@ def get_label2index(labels):
     return label2index
 
 
-def create_ckpt_dir(date_time):
-    timestamp = date_time.strftime('%Y_%m_%d-%H_%M_%S')
-    ckpt_dir = os.path.join(root_path(), 'output', 'checkpoints', timestamp)
+def get_ckpt_dir(date_time):
+    if not isinstance(date_time, str):
+        timestamp = date_time.strftime('%Y_%m_%d-%H_%M_%S')
+    else:
+        timestamp = date_time
+    ckpt_dir = os.path.join(root_path(), OUTPUT_DIR_NAME, 'checkpoints', timestamp)
     if not os.path.exists(ckpt_dir):
         os.makedirs(ckpt_dir)
-    else:
-        raise FileExistsError(f"{ckpt_dir} already exists")
+        if not isinstance(date_time, str):
+            raise FileExistsError(f"{ckpt_dir} already exists")
     return ckpt_dir
 
 
@@ -191,3 +195,15 @@ def dict2json(obj: dict, save_path):
     except TypeError as e:
         # Handle the error (e.g., object is not serializable)
         raise TypeError(f"An error occurred while dumping JSON: {e}")
+
+
+def permute_sequence_by_length(sequence, sequence_lengths):
+    """
+    Sort a sequence by length
+    :param sequence: list
+    :param sequence_lengths: list
+    :return:
+    """
+    sorted_sequence_lengths, sorted_indices = sequence_lengths.sort(0, descending=True)
+    sorted_sequence = sequence[sorted_indices]
+    return sorted_sequence, sorted_sequence_lengths, sorted_indices

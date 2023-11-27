@@ -30,3 +30,4 @@ TRAIN_CONFIG_NAME = "train_config.json"
 # <-- General settings -->
 LOGGING_LEVEL = 'DEBUG'  # Logging level, possible values: DEBUG, INFO, WARNING, ERROR, CRITICAL
 SEED = 2023
+OUTPUT_DIR_NAME = "output"
