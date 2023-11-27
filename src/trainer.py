@@ -64,7 +64,7 @@ class Trainer:
         torch.save(self._model.state_dict(), path)
 
     def _train_one_epoch(self, model, train_dataloader, optimizer, loss_function, device, update_func, labels):
-        log_interval = int(len(train_dataloader) * 0.01)
+        log_interval = max(2, int(len(train_dataloader) * 0.01))
         cm = ConfusionMatrix(labels)
         len_train_dataloader = len(train_dataloader)
         epoch_loss = 0.

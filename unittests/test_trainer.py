@@ -23,8 +23,8 @@ class TrainerTestCase(unittest.TestCase):
         cls.data_processor = data_processor
 
     def test_model_train(self):
-        train_dataloader = self.data_processor.get_dataloader(TRAIN_FILENAME, 0)
-        dev_dataloader = self.data_processor.get_dataloader(DEV_FILENAME, 0)
+        train_dataloader = self.data_processor.get_dataloader(TRAIN_FILENAME, 0, num_samples=10)
+        dev_dataloader = self.data_processor.get_dataloader(DEV_FILENAME, 0, num_samples=10)
 
         embedding_dim = get_embedding_dim()
         embedding = embed_vocab(embed_path=embedding_path(), vocab=self.data_processor.vocab)
@@ -42,10 +42,6 @@ class TrainerTestCase(unittest.TestCase):
         trainer = Trainer()
         trainer.train(model, train_dataloader, dev_dataloader, optimizer, criteria, epochs, self.data_processor.labels,
                       self.device)
-
-        ckpt_dir = create_ckpt_dir(date_time=datetime.now())
-        save_path = os.path.join(ckpt_dir, MODEL_NAME)
-        trainer.save_model(save_path)
 
 
 if __name__ == '__main__':

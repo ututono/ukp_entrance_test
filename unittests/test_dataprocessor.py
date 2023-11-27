@@ -44,6 +44,11 @@ class DataProcessorTestCase(unittest.TestCase):
         LABELS_NUM = 9
         self.assertEqual(LABELS_NUM, self.data_processor.num_tags)
 
+    def test_dataset_size(self):
+        TRAIN_SENTENCE_NUM = 2
+        train_dataset = self.data_processor.get_dataset(TRAIN_FILENAME, num_samples=TRAIN_SENTENCE_NUM)
+        self.assertEqual(len(train_dataset), TRAIN_SENTENCE_NUM)
+
 
 if __name__ == '__main__':
     unittest.main()

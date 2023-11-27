@@ -102,7 +102,7 @@ class DataProcessor:
         """
         raise NotImplementedError
 
-    def get_dataset(self, filename: str) -> TensorDataset:
+    def get_dataset(self, filename: str, num_samples=None) -> TensorDataset:
         self._check_attributes_none(['vocab'])
 
         labels_tensors = []  # Each element is a list of indices of labels from a sentence
@@ -113,13 +113,15 @@ class DataProcessor:
 
         sentences, labels_list = extract_sent_labels(file_df)
 
-        for sent, labels in zip(sentences, labels_list):
+        for idx, (sent, labels) in enumerate(zip(sentences, labels_list)):
             label_vec = self._vectorize_label_set(labels)
             words_vec = self._vectorize_word(sent)
             sent_length = len(sent)
             sentences_lengths.append(torch.tensor(sent_length, dtype=self._tensor_type, device=self._device))
             sentences_tensors.append(torch.tensor(words_vec, dtype=self._tensor_type, device=self._device))
             labels_tensors.append(torch.tensor(label_vec, dtype=self._tensor_type, device=self._device))
+            if num_samples is not None and idx+1 == num_samples:
+                break
 
         sentences_lengths = torch.stack(sentences_lengths)
         x_tensor = torch.nn.utils.rnn.pad_sequence(sentences_tensors, batch_first=True)
@@ -128,9 +130,9 @@ class DataProcessor:
         dataset = TensorDataset(x_tensor, sentences_lengths, y_tensor)
         return dataset
 
-    def get_dataloader(self, filename: str, num_workers=None) -> DataLoader:
+    def get_dataloader(self, filename: str, num_workers=None, num_samples=None) -> DataLoader:
         num_workers = self._num_workers if num_workers is None else num_workers
-        dataset = self.get_dataset(filename)
+        dataset = self.get_dataset(filename, num_samples=num_samples)
         return DataLoader(dataset, batch_size=self._batch_size, shuffle=self._shuffle, drop_last=True)
 
     def _vectorize_label_set(self, labels: List[str]):
