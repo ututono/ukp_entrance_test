@@ -8,7 +8,7 @@ import numpy as np
 import torch
 import random
 
-from global_variables import ENCODING, NEGLECT_TAGS, DATA_COL_NAMES, START_TAG, STOP_TAG, SEED
+from src.utils.global_variables import ENCODING, NEGLECT_TAGS, DATA_COL_NAMES, START_TAG, STOP_TAG, SEED
 
 
 def root_path():

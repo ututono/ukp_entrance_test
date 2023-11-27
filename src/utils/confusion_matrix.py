@@ -2,7 +2,6 @@ import csv
 from collections import OrderedDict
 
 import numpy as np
-from src.utils.global_variables import START_TAG, STOP_TAG
 
 
 class ConfusionMatrix:
