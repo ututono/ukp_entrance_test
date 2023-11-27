@@ -1,3 +1,4 @@
+import json
 import os
 from typing import Tuple
 
@@ -7,7 +8,7 @@ import numpy as np
 import torch
 import random
 
-from src.utils.global_variables import ENCODING, NEGLECT_TAGS, DATA_COL_NAMES, START_TAG, STOP_TAG, SEED
+from global_variables import ENCODING, NEGLECT_TAGS, DATA_COL_NAMES, START_TAG, STOP_TAG, SEED
 
 
 def root_path():
@@ -155,3 +156,38 @@ def convert_second_to_hms(seconds):
     seconds = int(seconds % 60)
     return hours, minutes, seconds
 
+
+def get_train_params(args, **kwargs) -> dict:
+    train_params = {
+        "batch_size": args.batch_size,
+        "epochs": args.epochs,
+        "seed": args.seed,
+        "learning_rate": args.learning_rate,
+        "device": None,
+        "optimizer": args.optimzer,
+        "loss": args.loss,
+        "checkpoint": None
+    }
+    train_params.update(kwargs)
+    return train_params
+
+
+def update_train_params(train_params, **kwargs):
+    train_params.update(kwargs)
+    return train_params
+
+
+def dict2json(obj: dict, save_path):
+    # Ensure the directory exists
+    os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+    # Attempt to write the dictionary to a JSON file
+    try:
+        with open(save_path, 'w') as f:
+            json.dump(obj, f, indent=4, separators=(',', ': '))
+    except IOError as e:
+        # Handle the error (e.g., permission error, disk full)
+        raise IOError(f"An error occurred while writing to the file: {e}")
+    except TypeError as e:
+        # Handle the error (e.g., object is not serializable)
+        raise TypeError(f"An error occurred while dumping JSON: {e}")

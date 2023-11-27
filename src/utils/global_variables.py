@@ -25,6 +25,7 @@ DATA_COL_NAMES = (WORD_COL, POS_COL, NP_COL, NER_COL)
 
 # <-- Model relevant configurations -->
 MODEL_NAME = "model.pt"
+TRAIN_CONFIG_NAME = "train_config.json"
 
 # <-- General settings -->
 LOGGING_LEVEL = 'DEBUG'  # Logging level, possible values: DEBUG, INFO, WARNING, ERROR, CRITICAL
