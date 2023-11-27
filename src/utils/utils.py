@@ -103,31 +103,9 @@ def get_label2index(labels):
     :param labels: list of labels
     :return: dict. Mapping from label to index
     """
-    # map the NEG tag to the number
+    # Map the NEG tag to the number
     label2index = {l: i for i, l in enumerate(labels)}
-
-    # map the NEG tag to the number with PAD tag
-    # label2index = {l: i + 1 for i, l in enumerate(labels)}
-    # for tag in NEGLECT_TAGS:
-    #     if tag in label2index:
-    #         label2index[tag] = 0
-    # label2index[START_TAG] = len(labels) + 1
-    # label2index[STOP_TAG] = len(labels) + 2
     return label2index
-
-
-def argmax(vec):
-    # return the argmax as a python int
-    _, idx = torch.max(vec, 1)
-    return idx.item()
-
-
-def log_sum_exp(vec):
-    """Compute log sum exp in a numerically stable way for the forward algorithm"""
-    max_score = vec[0, argmax(vec)]
-    max_score_broadcast = max_score.view(1, -1).expand(1, vec.size()[1])
-    return max_score + \
-        torch.log(torch.sum(torch.exp(vec - max_score_broadcast)))
 
 
 def create_ckpt_dir(date_time):

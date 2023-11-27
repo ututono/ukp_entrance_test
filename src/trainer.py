@@ -46,24 +46,16 @@ class Trainer:
         :return:
         """
         model = model.to(device)
-        if crf:
-            self._train_model_with_crf(model, train_dataloader, dev_dataloader, optimizer, loss_function, epochs,
-                                       labels,
-                                       device)
-        else:
-            self._train_vanilla_model(model, train_dataloader, dev_dataloader, optimizer, loss_function, epochs, labels,
-                                      device)
+        self._train_vanilla_model(model, train_dataloader, dev_dataloader, optimizer, loss_function, epochs, labels,
+                                  device)
 
-    def _train_model_with_crf(self, model, train_dataloader, dev_dataloader, optimizer, loss_function, epochs, labels,
-                              device):
-        raise NotImplementedError
 
     def _train_vanilla_model(self, model, train_dataloader, dev_dataloader, optimizer, loss_function, epochs, labels,
                              device):
 
         for epoch in range(epochs):
             logger.info(f"Epoch {epoch + 1}/{epochs}")
-            logger.info('-' * 10)
+            logger.info('-' * 100)
             self._train_one_epoch(model, train_dataloader, optimizer, loss_function, device, self._update_vanilla,
                                   labels)
             # logger.info(f"Dev confusion matrix:\n{self.evaluate(model, dev_dataloader, loss_function, device, labels)}")
@@ -78,12 +70,11 @@ class Trainer:
         cm = ConfusionMatrix(labels)
         len_train_dataloader = len(train_dataloader)
         epoch_loss = 0.
-        # start_time = time.time()
         start_time = torch.cuda.Event(enable_timing=True)
         end_time = torch.cuda.Event(enable_timing=True)
         start_time.record()
         for batch_idx, batch in enumerate(train_dataloader):
-            loss_value, y_pred, y_actual = update_func(model, loss_function, optimizer, batch, device, len(labels))
+            loss_value, y_pred, y_actual = update_func(model, loss_function, optimizer, batch, device)
             epoch_loss += loss_value
             yt = transfer_set_tensors_to_numpy(y_actual)
             yp = transfer_set_tensors_to_numpy(y_pred)
@@ -93,10 +84,6 @@ class Trainer:
                     msg = f" - loss: {loss_value:.6f}"
                 else:
                     average_loss = epoch_loss / len_train_dataloader
-                    # end_time = time.time()
-                    # elapsed_time = end_time - start_time
-                    # date_time = convert_second_to_hms(elapsed_time)
-
                     end_time.record()
                     torch.cuda.synchronize()
                     elapsed_time = start_time.elapsed_time(end_time)
@@ -107,13 +94,13 @@ class Trainer:
         logger.info(f"\nTraining confusion matrix:\n{cm.get_all_metrics()}")
 
 
-    def _update_vanilla(self, model, criteria, optimizer, batch, device, num_labels):
+    def _update_vanilla(self, model, criteria, optimizer, batch, device):
         """
         Perform a single training update on a given model batch for vanilla model.
 
         This function executes the forward pass, computes the loss, performs backpropagation, and updates the model parameters using the given optimizer.
 
-        :return: loss, predicted tags, golden tags
+        :return: loss, y_pred, y_target
         """
         optimizer.zero_grad()
         features, sent_lengths, labels = batch
@@ -136,9 +123,10 @@ class Trainer:
         batch_loss = 0.
         y_pred = []
         y_target = []
+
+        # Compute loss for each sentence in the batch
         for i in range(batch_size):
             golden_labels_sent_i = y_[i, :tags_scores_lengths[i]]
-            # golden_labels_sent_i = y_[i]
             tags_scores_sent_i = tags_scores[:tags_scores_lengths[i], i, :]
             predicted_labels_sent_i = torch.argmax(tags_scores_sent_i, dim=1)
             y_pred.append(predicted_labels_sent_i)
@@ -149,35 +137,3 @@ class Trainer:
         loss.backward()
         optimizer.step()
         return loss.item(), y_pred, y_target
-
-    def _update_crf(self, model, criteria, optimizer, batch, device, crf=False):
-        """
-        Perform a single training update on a given model batch.
-
-        This function executes the forward pass, computes the loss, performs backpropagation, and updates the model parameters using the given optimizer.
-        """
-        optimizer.zero_grad()
-
-        features, sent_lengths, labels = batch
-
-        # Sort the features and labels by their length, the longest first in this batch
-        sent_lengths, perm_idx = sent_lengths.sort(0, descending=True)
-        features_sorted = features[perm_idx]
-        labels_sorted = labels[perm_idx]
-
-        y_ = labels_sorted.to(device)
-        x_ = (features_sorted.to(device), sent_lengths.to(device))
-
-        # Used for confusion matrix calculation
-        y_pred = model(x_)
-
-        # Remove padding from prediction, only use valid labels for loss calculation
-        mask = (labels_sorted != 0)
-        valid_labels = torch.masked_select(labels_sorted, mask)
-        # valid = (mask.sum(dim=1))
-        # y_sorted = y_sorted[mask].split(valid.tolist())[0]
-
-        loss = criteria(y_pred, valid_labels)
-
-        loss.backward()
-        optimizer.step()
