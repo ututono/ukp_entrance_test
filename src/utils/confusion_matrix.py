@@ -24,7 +24,7 @@ class ConfusionMatrix:
         else:
             self.labels = labels
         nc = len(self.labels)
-        self._cm = np.zeros((nc, nc), dtype=np.int)
+        self._cm = np.zeros((nc, nc), dtype=int)
 
     def add(self, truth, guess):
         """Add a single value to the confusion matrix based off `truth` and `guess`

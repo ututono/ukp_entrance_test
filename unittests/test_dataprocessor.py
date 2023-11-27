@@ -11,10 +11,12 @@ DATA_DIR_NAME = 'data'
 
 class DataProcessorTestCase(unittest.TestCase):
     BATCH_SIZE = 32
+
     @classmethod
     def setUpClass(cls):
         data_processor = DataProcessor(os.path.join(root_path(), DATA_DIR_NAME), cls.BATCH_SIZE)
         cls.data_processor = data_processor
+
     def test_get_dataset(self):
         TRAIN_SENTENCE_NUM = 7389
 
@@ -29,7 +31,6 @@ class DataProcessorTestCase(unittest.TestCase):
         # The padding length of the labels should be the same
         self.assertEqual(train_dataset[2][2].shape, train_dataset[1][2].shape, train_dataset[random_index][2].shape)
 
-
     def test_get_dataloader(self):
         train_dataloader = self.data_processor.get_dataloader(TRAIN_FILENAME, 0)
 
@@ -38,6 +39,11 @@ class DataProcessorTestCase(unittest.TestCase):
         train_features, sent_lengths, train_labels = next(iter(train_dataloader))
         self.assertEqual(train_features.shape, train_labels.shape)
         self.assertEqual(train_features.shape[0], self.BATCH_SIZE)
+
+    def test_vectorize_labels(self):
+        LABELS_NUM = 9
+        self.assertEqual(LABELS_NUM, self.data_processor.num_tags)
+
 
 if __name__ == '__main__':
     unittest.main()

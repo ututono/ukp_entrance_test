@@ -1,11 +1,13 @@
 import os
+from typing import Tuple
 
 import pandas as pd
 from torch import nn
 import numpy as np
 import torch
+import random
 
-from src.utils.global_variables import ENCODING, NEGLECT_TAGS, DATA_COL_NAMES, START_TAG, STOP_TAG
+from src.utils.global_variables import ENCODING, NEGLECT_TAGS, DATA_COL_NAMES, START_TAG, STOP_TAG, SEED
 
 
 def root_path():
@@ -102,10 +104,69 @@ def get_label2index(labels):
     :return: dict. Mapping from label to index
     """
     # map the NEG tag to the number
-    label2index = {l: i + 1 for i, l in enumerate(labels)}
-    for tag in NEGLECT_TAGS:
-        if tag in label2index:
-            label2index[tag] = 0
-    label2index[START_TAG] = len(labels) + 1
-    label2index[STOP_TAG] = len(labels) + 2
+    label2index = {l: i for i, l in enumerate(labels)}
+
+    # map the NEG tag to the number with PAD tag
+    # label2index = {l: i + 1 for i, l in enumerate(labels)}
+    # for tag in NEGLECT_TAGS:
+    #     if tag in label2index:
+    #         label2index[tag] = 0
+    # label2index[START_TAG] = len(labels) + 1
+    # label2index[STOP_TAG] = len(labels) + 2
     return label2index
+
+
+def argmax(vec):
+    # return the argmax as a python int
+    _, idx = torch.max(vec, 1)
+    return idx.item()
+
+
+def log_sum_exp(vec):
+    """Compute log sum exp in a numerically stable way for the forward algorithm"""
+    max_score = vec[0, argmax(vec)]
+    max_score_broadcast = max_score.view(1, -1).expand(1, vec.size()[1])
+    return max_score + \
+        torch.log(torch.sum(torch.exp(vec - max_score_broadcast)))
+
+
+def create_ckpt_dir(date_time):
+    timestamp = date_time.strftime('%Y_%m_%d-%H_%M_%S')
+    ckpt_dir = os.path.join(root_path(), 'output', 'checkpoints', timestamp)
+    if not os.path.exists(ckpt_dir):
+        os.makedirs(ckpt_dir)
+    else:
+        raise FileExistsError(f"{ckpt_dir} already exists")
+    return ckpt_dir
+
+
+def extract_valid_labels(mask, labels) -> Tuple:
+    """Remove padding from prediction, only use valid labels for loss calculation"""
+    valid = (mask.sum(dim=1))
+    result = labels[mask].split(valid.tolist())
+    return result
+
+
+def transfer_set_tensors_to_numpy(set_tensors):
+    """
+    Transfer a set of tensors to numpy
+    :param set_tensors:
+    :return:
+    """
+    return [tensor.cpu().int().numpy() for tensor in set_tensors]
+
+
+def seed_random_generators(seed=SEED):
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    random.seed(seed)
+
+
+def convert_milliseconds_to_hms(milliseconds):
+    seconds = milliseconds / 1000
+    hours = int(seconds // 3600)
+    minutes = int((seconds % 3600) // 60)
+    seconds = seconds % 60
+    return hours, minutes, seconds
+

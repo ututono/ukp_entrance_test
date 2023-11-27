@@ -29,6 +29,10 @@ class UtilsTestCase(unittest.TestCase):
         data_processor = DataProcessor(os.path.join(root_path(), DATA_DIR_NAME), self.BATCH_SIZE)
         utils.embed_vocab(embed_path=embedding_path(), vocab=data_processor.vocab)
 
+    def test_convert_milliseconds_to_hms(self):
+        actual_time = (0, 0, 0.001)
+        self.assertEqual(actual_time, utils.convert_milliseconds_to_hms(1))
+
 
 
 if __name__ == '__main__':

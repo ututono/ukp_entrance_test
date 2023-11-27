@@ -149,3 +149,15 @@ class DataProcessor:
     @property
     def vocab(self):
         return self._vocab
+
+    @property
+    def labels(self):
+        return self._labels
+
+    @property
+    def label2index(self):
+        return self._label2index
+
+    @property
+    def num_tags(self):
+        return len(self._label2index)
