@@ -8,7 +8,7 @@ import numpy as np
 import torch
 import random
 
-from src.utils.global_variables import ENCODING, NEGLECT_TAGS, DATA_COL_NAMES, START_TAG, STOP_TAG, SEED
+from src.utils_.global_variables import ENCODING, NEGLECT_TAGS, DATA_COL_NAMES, START_TAG, STOP_TAG, SEED
 
 
 def root_path():
@@ -164,7 +164,7 @@ def get_train_params(args, **kwargs) -> dict:
         "seed": args.seed,
         "learning_rate": args.learning_rate,
         "device": None,
-        "optimizer": args.optimzer,
+        "optimizer": args.optimizer,
         "loss": args.loss,
         "checkpoint": None
     }

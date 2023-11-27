@@ -5,8 +5,8 @@ from datetime import datetime
 import torch
 
 from src.data_processor import DataProcessor
-from src.utils.utils import root_path, get_embedding_dim, embed_vocab, embedding_path, create_ckpt_dir, seed_random_generators
-from src.utils.global_variables import DATA_DIR_NAME, TRAIN_FILENAME, DEV_FILENAME, MODEL_NAME, SEED
+from src.utils_.utils import root_path, get_embedding_dim, embed_vocab, embedding_path, create_ckpt_dir, seed_random_generators
+from src.utils_.global_variables import DATA_DIR_NAME, TRAIN_FILENAME, DEV_FILENAME, MODEL_NAME, SEED
 from src.trainer import Trainer
 from src.model import VanillaBiLSTMTagger
 

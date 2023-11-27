@@ -1,5 +1,5 @@
 import argparse
-from src.utils.global_variables import SEED
+from src.utils_.global_variables import SEED
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Train a model for a simple sequence tagger.')

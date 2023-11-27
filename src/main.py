@@ -3,18 +3,17 @@ from datetime import datetime
 import sys
 import torch
 
-sys.path.append('..')
-
 from src.data_processor import DataProcessor
 from src.model import VanillaBiLSTMTagger
 from src.trainer import Trainer
-from src.utils.global_variables import SEED, DATA_DIR_NAME, TRAIN_FILENAME, DEV_FILENAME, MODEL_NAME, TRAIN_CONFIG_NAME, LOGGING_LEVEL
-from src.utils.utils import root_path, seed_random_generators, embedding_path, get_embedding_dim, embed_vocab, \
+from src.utils_.global_variables import SEED, DATA_DIR_NAME, TRAIN_FILENAME, DEV_FILENAME, MODEL_NAME, TRAIN_CONFIG_NAME, LOGGING_LEVEL
+from src.utils_.utils import root_path, seed_random_generators, embedding_path, get_embedding_dim, embed_vocab, \
     create_ckpt_dir, get_train_params, update_train_params, dict2json
 from src.settings import parse_arguments
-from src.utils.basic_logger import setup_logger
+from src.utils_.basic_logger import setup_logger
 
 logger = setup_logger(__name__, LOGGING_LEVEL)
+logger.info(f"Current working directory: {os.getcwd()}")
 
 
 def pipeline_train(train_params):
@@ -62,7 +61,7 @@ def pipeline_train(train_params):
 
     # Create checkpoint directory and save it to train_params
     ckpt_dir = create_ckpt_dir(date_time=datetime.now())
-    update_train_params(train_params, checkpoint=ckpt_dir)
+    update_train_params(train_params, checkpoint=ckpt_dir, device=device)
 
     # Save model and training parameters
     model_save_path = os.path.join(ckpt_dir, MODEL_NAME)

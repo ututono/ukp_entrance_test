@@ -4,9 +4,9 @@ import unittest
 import time
 import os
 
-import src.utils.utils as utils
+import src.utils_.utils as utils
 from src.data_processor import DataProcessor
-from src.utils.utils import root_path, embedding_path
+from src.utils_.utils import root_path, embedding_path
 
 DATA_DIR_NAME = 'data'
 

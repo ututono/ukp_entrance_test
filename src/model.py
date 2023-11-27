@@ -3,8 +3,8 @@ from torch import nn
 import torch.nn.functional as F
 import torch.optim as optim
 
-from utils.global_variables import START_TAG, STOP_TAG, LOGGING_LEVEL
-from utils.basic_logger import setup_logger
+from src.utils_.global_variables import START_TAG, STOP_TAG, LOGGING_LEVEL
+from src.utils_.basic_logger import setup_logger
 
 logger = setup_logger(__name__, LOGGING_LEVEL)
 

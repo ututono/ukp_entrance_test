@@ -8,12 +8,12 @@ from collections import Counter
 import torch
 from torch.utils.data import DataLoader, TensorDataset
 
-from src.utils.global_variables import TEST_FILENAME, TRAIN_FILENAME, DEV_FILENAME, ENCODING, DATA_COL_NAMES, WORD_COL, \
-    NER_COL, NEGLECT_TAGS, ENDING_PUNCTUATIONS, DATA_OPT
-from src.utils.utils import root_path, get_embedding_dim, read_csv_file, get_label2index
-from src.utils.basic_logger import setup_logger
+from src.utils_.global_variables import TEST_FILENAME, TRAIN_FILENAME, DEV_FILENAME, ENCODING, DATA_COL_NAMES, WORD_COL, \
+    NER_COL, NEGLECT_TAGS, ENDING_PUNCTUATIONS, DATA_OPT, LOGGING_LEVEL
+from src.utils_.utils import root_path, get_embedding_dim, read_csv_file, get_label2index
+from src.utils_.basic_logger import setup_logger
 
-logger = setup_logger(__name__, level='DEBUG')
+logger = setup_logger(__name__, level=LOGGING_LEVEL)
 
 
 def extract_sent_labels(data_df: pd.DataFrame):

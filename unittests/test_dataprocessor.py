@@ -3,8 +3,8 @@ import unittest
 import random
 
 from src.data_processor import DataProcessor
-from src.utils.global_variables import TRAIN_FILENAME
-from src.utils.utils import root_path
+from src.utils_.global_variables import TRAIN_FILENAME
+from src.utils_.utils import root_path
 
 DATA_DIR_NAME = 'data'
 

@@ -3,10 +3,10 @@ import numpy as np
 from torch.utils.data import DataLoader, TensorDataset
 import time
 import sys
-from src.utils.confusion_matrix import ConfusionMatrix
-from src.utils.basic_logger import setup_logger
-from src.utils.global_variables import LOGGING_LEVEL
-from src.utils.utils import extract_valid_labels, transfer_set_tensors_to_numpy, convert_milliseconds_to_hms, \
+from src.utils_.confusion_matrix import ConfusionMatrix
+from src.utils_.basic_logger import setup_logger
+from src.utils_.global_variables import LOGGING_LEVEL
+from src.utils_.utils import extract_valid_labels, transfer_set_tensors_to_numpy, convert_milliseconds_to_hms, \
     convert_second_to_hms
 
 logger = setup_logger(__name__, level=LOGGING_LEVEL)
@@ -31,8 +31,7 @@ class Trainer:
     def __init__(self):
         self._model = None
 
-    def train(self, model, train_dataloader, dev_dataloader, optimizer, loss_function, epochs, labels, device,
-              crf=False):
+    def train(self, model, train_dataloader, dev_dataloader, optimizer, loss_function, epochs, labels, device):
         """
         Train the model
         :param labels:
@@ -48,7 +47,6 @@ class Trainer:
         model = model.to(device)
         self._train_vanilla_model(model, train_dataloader, dev_dataloader, optimizer, loss_function, epochs, labels,
                                   device)
-
 
     def _train_vanilla_model(self, model, train_dataloader, dev_dataloader, optimizer, loss_function, epochs, labels,
                              device):
@@ -92,7 +90,6 @@ class Trainer:
                 process_bar(batch_idx, len_train_dataloader, msg)
 
         logger.info(f"\nTraining confusion matrix:\n{cm.get_all_metrics()}")
-
 
     def _update_vanilla(self, model, criteria, optimizer, batch, device):
         """

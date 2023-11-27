@@ -2,7 +2,7 @@ import logging
 import os
 import sys
 
-from src.utils.utils import root_path
+from src.utils_.utils import root_path
 
 
 class MyFormatter(logging.Formatter):
