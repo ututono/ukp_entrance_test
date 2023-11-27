@@ -1,3 +1,4 @@
+import sys
 import unittest
 
 import time
@@ -8,6 +9,7 @@ from src.data_processor import DataProcessor
 from src.utils.utils import root_path, embedding_path
 
 DATA_DIR_NAME = 'data'
+
 
 class UtilsTestCase(unittest.TestCase):
     BATCH_SIZE = 32
@@ -33,6 +35,18 @@ class UtilsTestCase(unittest.TestCase):
         actual_time = (0, 0, 0.001)
         self.assertEqual(actual_time, utils.convert_milliseconds_to_hms(1))
 
+    def test_convert_second_to_hms(self):
+        actual_time = (0, 0, 1)
+        self.assertEqual(actual_time, utils.convert_second_to_hms(1))
+
+        SLEEP_TIME = 1
+        start_time = time.time()
+        time.sleep(SLEEP_TIME)
+        end_time = time.time()
+        elapsed_time = end_time - start_time
+        self.assertAlmostEqual(elapsed_time, SLEEP_TIME, delta=1)
+        date_time = utils.convert_second_to_hms(elapsed_time)
+        self.assertEqual("Elapsed time: 0h:0m:1s", f"Elapsed time: {date_time[0]}h:{date_time[1]}m:{date_time[2]}s")
 
 
 if __name__ == '__main__':

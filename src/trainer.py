@@ -1,12 +1,13 @@
 import torch
 import numpy as np
 from torch.utils.data import DataLoader, TensorDataset
-
+import time
 import sys
 from src.utils.confusion_matrix import ConfusionMatrix
 from src.utils.basic_logger import setup_logger
 from src.utils.global_variables import LOGGING_LEVEL
-from src.utils.utils import extract_valid_labels, transfer_set_tensors_to_numpy, convert_milliseconds_to_hms
+from src.utils.utils import extract_valid_labels, transfer_set_tensors_to_numpy, convert_milliseconds_to_hms, \
+    convert_second_to_hms
 
 logger = setup_logger(__name__, level=LOGGING_LEVEL)
 
@@ -77,10 +78,11 @@ class Trainer:
         cm = ConfusionMatrix(labels)
         len_train_dataloader = len(train_dataloader)
         epoch_loss = 0.
+        # start_time = time.time()
+        start_time = torch.cuda.Event(enable_timing=True)
+        end_time = torch.cuda.Event(enable_timing=True)
+        start_time.record()
         for batch_idx, batch in enumerate(train_dataloader):
-            start_time = torch.cuda.Event(enable_timing=True)
-            end_time = torch.cuda.Event(enable_timing=True)
-            start_time.record()
             loss_value, y_pred, y_actual = update_func(model, loss_function, optimizer, batch, device, len(labels))
             epoch_loss += loss_value
             yt = transfer_set_tensors_to_numpy(y_actual)
@@ -91,6 +93,10 @@ class Trainer:
                     msg = f" - loss: {loss_value:.6f}"
                 else:
                     average_loss = epoch_loss / len_train_dataloader
+                    # end_time = time.time()
+                    # elapsed_time = end_time - start_time
+                    # date_time = convert_second_to_hms(elapsed_time)
+
                     end_time.record()
                     torch.cuda.synchronize()
                     elapsed_time = start_time.elapsed_time(end_time)
