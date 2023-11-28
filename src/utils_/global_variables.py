@@ -27,6 +27,7 @@ DATA_COL_NAMES = (WORD_COL, POS_COL, NP_COL, NER_COL)
 MODEL_NAME = "model.pt"
 TRAIN_CONFIG_NAME = "train_config.json"
 VAL_CM_NAME = "val_confusion_matrix.json"
+TRAIN_CM_NAME = "train_confusion_matrix.json"
 # <-- General settings -->
 LOGGING_LEVEL = 'DEBUG'  # Logging level, possible values: DEBUG, INFO, WARNING, ERROR, CRITICAL
 SEED = 2023

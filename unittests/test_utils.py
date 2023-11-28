@@ -54,7 +54,7 @@ class UtilsTestCase(unittest.TestCase):
         self.assertEqual(mock_ckpt_dir, utils.get_ckpt_dir(date_time='2023_11_27-17_16_04'))
 
     def test_visualize_cm(self):
-        ckpt_dir = utils.get_ckpt_dir(date_time='2023_11_28-03_37_47')
+        ckpt_dir = utils.get_ckpt_dir(date_time='2023_11_28-14_39_16')
         val_cm = utils.json2dict(os.path.join(ckpt_dir, VAL_CM_NAME))
         utils.visualize_cm('macro_f1', val_cm, os.path.join(ckpt_dir, 'val_marco_f1.png'))
 

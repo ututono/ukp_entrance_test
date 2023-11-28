@@ -9,7 +9,7 @@ import sys
 from src.evaluator import Evaluator
 from src.utils_.confusion_matrix import ConfusionMatrix
 from src.utils_.basic_logger import setup_logger
-from src.utils_.global_variables import LOGGING_LEVEL, VAL_CM_NAME
+from src.utils_.global_variables import LOGGING_LEVEL, VAL_CM_NAME, TRAIN_CM_NAME
 from src.utils_.utils import extract_valid_labels, transfer_set_tensors_to_numpy, convert_milliseconds_to_hms, \
     convert_second_to_hms, permute_sequence_by_length, init_cm_result_dict, dict2json
 
@@ -57,6 +57,7 @@ class Trainer:
                              device, ckpt_dir):
 
         val_cms_result = init_cm_result_dict()
+        train_cms_result = init_cm_result_dict()
         for epoch in range(epochs):
             logger.info(f"Epoch {epoch + 1}/{epochs}")
             logger.info('-' * 100)
@@ -65,9 +66,10 @@ class Trainer:
 
             for k in val_cms_result.keys():
                 val_cms_result[k].append(val_cm.get_all_metrics()[k])
+                train_cms_result[k].append(train_cm.get_all_metrics()[k])
 
         dict2json(val_cms_result, os.path.join(ckpt_dir, VAL_CM_NAME))
-        logger.debug(f"Val_CMS_Result:{val_cms_result}")# Save model
+        dict2json(train_cms_result, os.path.join(ckpt_dir, TRAIN_CM_NAME))
         self._model = model
 
     def save_model(self, path):
