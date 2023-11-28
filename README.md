@@ -17,5 +17,42 @@ ROOT_PATH = <path to root directory>
 ```
 Note that if you are using Windows, you should use double backslash `\\` instead of single backslash `\` in the path.
 
-## Usage
-### Train
+### 1.3 Download embedding file
+Download embedding file and unzip it to `pretrained` directory under root directory. 
+
+## 2. Usage
+Move to the root directory of this repository.
+### 2.1 Train
+Run the following command to train the model:
+```bash
+python -m src.main \
+  --batch_size 1 \
+  --epochs 20 \
+  --learning_rate 0.001 \
+  --optimizer adam \
+  --loss cross_entropy \
+  --mode train \
+```
+There is a template script in `scripts` directory. You can modify it and run it as follows:
+```bash
+bash scripts/train.sh
+```
+The model will be saved to a timestamped directory under `output/checkpoint`, for example `output/checkpoint/1970_01_01-00_00_00`.
+
+### 2.2 Test
+Run the following command to test the model:
+```bash
+python3 -m src.main \
+  --batch_size 1 \
+  --loss cross_entropy \
+  --checkpoint 2023_11_27-17_16_04 \
+  --mode test \
+```
+There is a template script in `scripts` directory. You can modify it and run it as follows:
+```bash
+bash scripts/evaluate.sh
+```
+
+
+
+
