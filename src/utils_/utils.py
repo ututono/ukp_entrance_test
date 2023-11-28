@@ -7,6 +7,7 @@ from torch import nn
 import numpy as np
 import torch
 import random
+import matplotlib.pyplot as plt
 
 from src.utils_.global_variables import ENCODING, NEGLECT_TAGS, DATA_COL_NAMES, START_TAG, STOP_TAG, SEED, \
     OUTPUT_DIR_NAME
@@ -173,10 +174,12 @@ def get_train_params(args, **kwargs) -> dict:
         "loss": args.loss,
         "checkpoint": None,
         'mode': args.mode,
+        "hidden_dim": args.hidden_dim,
         "num_samples": args.num_samples,
     }
     train_params.update(kwargs)
     return train_params
+
 
 def get_eval_params(args, **kwargs) -> dict:
     eval_params = {
@@ -213,6 +216,20 @@ def dict2json(obj: dict, save_path):
         raise TypeError(f"An error occurred while dumping JSON: {e}")
 
 
+def json2dict(json_path):
+    # Attempt to read the JSON file
+    try:
+        with open(json_path, 'r', encoding=ENCODING) as f:
+            obj = json.load(f)
+    except IOError as e:
+        # Handle the error (e.g., file not found)
+        raise IOError(f"An error occurred while reading the file: {e}")
+    except ValueError as e:
+        # Handle the error (e.g., JSON syntax error)
+        raise ValueError(f"An error occurred while parsing JSON: {e}")
+    return obj
+
+
 def permute_sequence_by_length(sequence, sequence_lengths):
     """
     Sort a sequence by length
@@ -223,3 +240,38 @@ def permute_sequence_by_length(sequence, sequence_lengths):
     sorted_sequence_lengths, sorted_indices = sequence_lengths.sort(0, descending=True)
     sorted_sequence = sequence[sorted_indices]
     return sorted_sequence, sorted_sequence_lengths, sorted_indices
+
+
+def init_cm_result_dict():
+    """
+    Initialize the confusion matrix result dictionary where stores the metrics during the training
+    :param labels: list of labels
+    :return: dict. The confusion matrix result dictionary
+    """
+    cm_result = {
+        "acc": [],
+        "mean_precision": [],
+        "mean_recall": [],
+        "macro_f1": [],
+        "weighted_precision": [],
+        "weighted_recall": [],
+        "weighted_f1": [],
+    }
+    return cm_result
+
+
+def visualize_cm(key: str, cms_result: dict, save_path: str = None):
+    """
+    Visualize the confusion matrix result
+    :param key: str. The key of the confusion matrix result
+    :param cms_result: dict. The confusion matrix result dictionary
+    :return:
+    """
+    fig, axs = plt.subplots(1, 1, figsize=(10, 10))
+    axs.plot(cms_result[key])
+    axs.set_title(f"{key} during training")
+    axs.set_xlabel('Epoch')
+    axs.set_ylabel(key)
+    if save_path:
+        plt.savefig(save_path)
+    plt.show()
