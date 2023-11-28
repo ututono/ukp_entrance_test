@@ -6,7 +6,7 @@ import os
 
 import src.utils_.utils as utils
 from src.data_processor import DataProcessor
-from src.utils_.global_variables import OUTPUT_DIR_NAME
+from src.utils_.global_variables import OUTPUT_DIR_NAME, VAL_CM_NAME
 from src.utils_.utils import root_path, embedding_path
 
 DATA_DIR_NAME = 'data'
@@ -52,6 +52,11 @@ class UtilsTestCase(unittest.TestCase):
     def test_get_ckpt_dir(self):
         mock_ckpt_dir = os.path.join(root_path(), OUTPUT_DIR_NAME, 'checkpoints', '2023_11_27-17_16_04')
         self.assertEqual(mock_ckpt_dir, utils.get_ckpt_dir(date_time='2023_11_27-17_16_04'))
+
+    def test_visualize_cm(self):
+        ckpt_dir = utils.get_ckpt_dir(date_time='2023_11_28-03_37_47')
+        val_cm = utils.json2dict(os.path.join(ckpt_dir, VAL_CM_NAME))
+        utils.visualize_cm('macro_f1', val_cm, os.path.join(ckpt_dir, 'val_marco_f1.png'))
 
 
 if __name__ == '__main__':
