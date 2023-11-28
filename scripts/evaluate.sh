@@ -23,10 +23,9 @@ echo "ROOT_PATH is set to '$ROOT_PATH'"
 # Move the working directory to ROOT_PATH
 cd $ROOT_PATH
 
+
 python3 -m src.main \
   --batch_size 1 \
-  --epochs 20 \
-  --learning_rate 0.001 \
-  --optimizer adam \
   --loss cross_entropy \
-  --mode train \
+  --load_ckpt 2023_11_27-17_16_04 \
+  --mode test \

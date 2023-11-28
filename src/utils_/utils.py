@@ -170,13 +170,26 @@ def get_train_params(args, **kwargs) -> dict:
         "device": None,
         "optimizer": args.optimizer,
         "loss": args.loss,
-        "checkpoint": None
+        "checkpoint": None,
+        'mode': args.mode,
     }
     train_params.update(kwargs)
     return train_params
 
+def get_eval_params(args, **kwargs) -> dict:
+    eval_params = {
+        'checkpoint': args.load_ckpt,
+        'device': None,
+        'batch_size': args.batch_size,
+        'loss': args.loss,
+        'mode': args.mode,
+        'seed': args.seed,
+    }
+    eval_params.update(kwargs)
+    return eval_params
 
-def update_train_params(train_params, **kwargs):
+
+def update_param_dict(train_params, **kwargs):
     train_params.update(kwargs)
     return train_params
 
