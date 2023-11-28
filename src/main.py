@@ -58,14 +58,15 @@ def pipeline_train(train_params):
     else:
         raise NotImplementedError(f"{loss_name} is not implemented yet")
 
-    # Instantiate trainer to train the model
-    trainer = Trainer()
-    trainer.train(model, train_dataloader, dev_dataloader, optimizer, criteria, epochs, data_processor.labels,
-                  device)
-
     # Create checkpoint directory and save it to train_params
     ckpt_dir = get_ckpt_dir(date_time=datetime.now())
     update_param_dict(train_params, checkpoint=ckpt_dir, device="cuda:0")
+
+    # Instantiate trainer to train the model
+    trainer = Trainer()
+    trainer.train(model, train_dataloader, dev_dataloader, optimizer, criteria, epochs, data_processor.labels, device,
+                  ckpt_dir)
+
 
     # Save model and training parameters
     model_save_path = os.path.join(ckpt_dir, MODEL_NAME)

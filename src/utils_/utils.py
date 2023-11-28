@@ -179,6 +179,7 @@ def get_train_params(args, **kwargs) -> dict:
     train_params.update(kwargs)
     return train_params
 
+
 def get_eval_params(args, **kwargs) -> dict:
     eval_params = {
         "checkpoint": args.checkpoint,
@@ -224,3 +225,21 @@ def permute_sequence_by_length(sequence, sequence_lengths):
     sorted_sequence_lengths, sorted_indices = sequence_lengths.sort(0, descending=True)
     sorted_sequence = sequence[sorted_indices]
     return sorted_sequence, sorted_sequence_lengths, sorted_indices
+
+
+def init_cm_result_dict():
+    """
+    Initialize the confusion matrix result dictionary where stores the metrics during the training
+    :param labels: list of labels
+    :return: dict. The confusion matrix result dictionary
+    """
+    cm_result = {
+        "acc": [],
+        "mean_precision": [],
+        "mean_recall": [],
+        "macro_f1": [],
+        "weighted_precision": [],
+        "weighted_recall": [],
+        "weighted_f1": [],
+    }
+    return cm_result

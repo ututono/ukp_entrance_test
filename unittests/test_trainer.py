@@ -41,7 +41,7 @@ class TrainerTestCase(unittest.TestCase):
 
         trainer = Trainer()
         trainer.train(model, train_dataloader, dev_dataloader, optimizer, criteria, epochs, self.data_processor.labels,
-                      self.device)
+                      self.device, None)
 
 
 if __name__ == '__main__':

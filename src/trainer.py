@@ -1,13 +1,17 @@
+import os.path
+
 import torch
 import numpy as np
 from torch.utils.data import DataLoader, TensorDataset
 import time
 import sys
+
+from src.evaluator import Evaluator
 from src.utils_.confusion_matrix import ConfusionMatrix
 from src.utils_.basic_logger import setup_logger
-from src.utils_.global_variables import LOGGING_LEVEL
+from src.utils_.global_variables import LOGGING_LEVEL, VAL_CM_NAME
 from src.utils_.utils import extract_valid_labels, transfer_set_tensors_to_numpy, convert_milliseconds_to_hms, \
-    convert_second_to_hms, permute_sequence_by_length
+    convert_second_to_hms, permute_sequence_by_length, init_cm_result_dict, dict2json
 
 logger = setup_logger(__name__, level=LOGGING_LEVEL)
 
@@ -31,9 +35,11 @@ class Trainer:
     def __init__(self):
         self._model = None
 
-    def train(self, model, train_dataloader, dev_dataloader, optimizer, loss_function, epochs, labels, device):
+    def train(self, model, train_dataloader, dev_dataloader, optimizer, loss_function, epochs, labels, device,
+              ckpt_dir):
         """
         Train the model
+        :param ckpt_dir:
         :param labels:
         :param model: model to train
         :param train_dataloader: dataloader for training data
@@ -44,25 +50,30 @@ class Trainer:
         :param device: device to train on
         :return:
         """
-        self._train_vanilla_model(model.to(device), train_dataloader, dev_dataloader, optimizer, loss_function, epochs, labels,
-                                  device)
+        self._train_vanilla_model(model.to(device), train_dataloader, dev_dataloader, optimizer, loss_function, epochs,
+                                  labels, device, ckpt_dir)
 
     def _train_vanilla_model(self, model, train_dataloader, dev_dataloader, optimizer, loss_function, epochs, labels,
-                             device):
+                             device, ckpt_dir):
 
+        val_cms_result = init_cm_result_dict()
         for epoch in range(epochs):
             logger.info(f"Epoch {epoch + 1}/{epochs}")
             logger.info('-' * 100)
-            self._train_one_epoch(model, train_dataloader, optimizer, loss_function, device, self._update_vanilla,
-                                  labels)
-            # logger.info(f"Dev confusion matrix:\n{self.evaluate(model, dev_dataloader, loss_function, device, labels)}")
+            train_cm, val_cm = self._train_one_epoch(model, train_dataloader, dev_dataloader, optimizer, loss_function, device, self._update_vanilla,
+                                       labels)
 
+            for k in val_cms_result.keys():
+                val_cms_result[k].append(val_cm.get_all_metrics()[k])
+
+        dict2json(val_cms_result, os.path.join(ckpt_dir, VAL_CM_NAME))
+        logger.debug(f"Val_CMS_Result:{val_cms_result}")# Save model
         self._model = model
 
     def save_model(self, path):
         torch.save(self._model.state_dict(), path)
 
-    def _train_one_epoch(self, model, train_dataloader, optimizer, loss_function, device, update_func, labels):
+    def _train_one_epoch(self, model, train_dataloader, dev_dataloader, optimizer, loss_function, device, update_func, labels):
         log_interval = max(2, int(len(train_dataloader) * 0.01))
         cm = ConfusionMatrix(labels)
         len_train_dataloader = len(train_dataloader)
@@ -85,10 +96,15 @@ class Trainer:
                     torch.cuda.synchronize()
                     elapsed_time = start_time.elapsed_time(end_time)
                     date_time = convert_milliseconds_to_hms(elapsed_time)
-                    msg = f" - Mean loss: {average_loss:.6f} - Elapsed time: {date_time[0]}h:{date_time[1]}m:{date_time[2]}s\n"
+
+                    evaluator = Evaluator()
+                    val_cm = evaluator.run(model, dev_dataloader, labels, device, criteria=loss_function)
+                    model.train()
+                    msg = f" - Mean loss: {average_loss:.6f} - Macro_f1 {val_cm.get_macro_f():.6f}- Elapsed time: {date_time[0]}h:{date_time[1]}m:{date_time[2]}s\n"
                 process_bar(batch_idx, len_train_dataloader, msg)
 
         logger.info(f"\nTraining confusion matrix:\n{cm.get_all_metrics()}")
+        return cm, val_cm
 
     def _update_vanilla(self, model, criteria, optimizer, batch, device):
         """
