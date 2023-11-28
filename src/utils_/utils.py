@@ -173,6 +173,7 @@ def get_train_params(args, **kwargs) -> dict:
         "loss": args.loss,
         "checkpoint": None,
         'mode': args.mode,
+        "hidden_dim": args.hidden_dim,
         "num_samples": args.num_samples,
     }
     train_params.update(kwargs)

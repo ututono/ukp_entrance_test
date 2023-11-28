@@ -27,6 +27,7 @@ def pipeline_train(train_params):
     optimizer_name = train_params["optimizer"]
     epochs = train_params["epochs"]
     num_samples = train_params["num_samples"]
+    hidden_dim = train_params['hidden_dim']
 
     # Set random seed
     seed_random_generators(seed)
@@ -45,7 +46,7 @@ def pipeline_train(train_params):
     embedding = embedding.to(device)
 
     # Instantiate model
-    model = VanillaBiLSTMTagger(embeddings=embedding, embedding_dim=embedding_dim, hidden_dim=100,
+    model = VanillaBiLSTMTagger(embeddings=embedding, embedding_dim=embedding_dim, hidden_dim=hidden_dim,
                                 tagset_size=tags_size)
 
     if optimizer_name == "adam":
