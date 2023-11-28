@@ -118,6 +118,7 @@ def get_ckpt_dir(date_time):
     ckpt_dir = os.path.join(root_path(), OUTPUT_DIR_NAME, 'checkpoints', timestamp)
     if not os.path.exists(ckpt_dir):
         os.makedirs(ckpt_dir)
+    else:
         if not isinstance(date_time, str):
             raise FileExistsError(f"{ckpt_dir} already exists")
     return ckpt_dir

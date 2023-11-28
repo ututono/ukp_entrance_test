@@ -64,7 +64,7 @@ def pipeline_train(train_params):
 
     # Create checkpoint directory and save it to train_params
     ckpt_dir = get_ckpt_dir(date_time=datetime.now())
-    update_param_dict(train_params, checkpoint=ckpt_dir, device=device)
+    update_param_dict(train_params, checkpoint=ckpt_dir, device="cuda:0")
 
     # Save model and training parameters
     model_save_path = os.path.join(ckpt_dir, MODEL_NAME)
