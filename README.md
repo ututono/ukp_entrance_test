@@ -20,6 +20,20 @@ Note that if you are using Windows, you should use double backslash `\\` instead
 ### 1.3 Download embedding file
 Download embedding file and unzip it to `pretrained` directory under root directory. 
 
+
+The project should be structured as follows:
+```txt
+- root
+  - pretrained
+    - glove.6B.100d.txt
+  - src
+    - ...
+  - .env
+  - README.md
+  - requirements.txt
+```
+
+
 ## 2. Usage
 Move to the root directory of this repository.
 ### 2.1 Train
@@ -42,7 +56,7 @@ The model will be saved to a timestamped directory under `output/checkpoint`, fo
 ### 2.2 Test
 Run the following command to test the model:
 ```bash
-python3 -m src.main \
+python -m src.main \
   --batch_size 1 \
   --loss cross_entropy \
   --checkpoint 2023_11_27-17_16_04 \
