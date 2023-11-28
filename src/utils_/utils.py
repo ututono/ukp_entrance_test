@@ -46,7 +46,7 @@ def embed_vocab(embed_path: str, vocab, uniform_bounding=0.25):
         """Initializing neural network weights randomly"""
         return np.random.uniform(-bounding, bounding, (vocab_size, embedding_dim))
 
-    with open(embed_path, 'r') as f:
+    with open(embed_path, 'r', encoding=ENCODING) as f:
         lines = f.readlines()
         embed_dim = len(lines[0].strip().split()) - 1
 
@@ -72,7 +72,7 @@ def embed_vocab(embed_path: str, vocab, uniform_bounding=0.25):
 def get_embedding_dim(embed_path: str = None):
     embed_path = embed_path if embed_path else embedding_path()
     check_path_exists(embed_path)
-    with open(embed_path, 'r') as f:
+    with open(embed_path, 'r', encoding=ENCODING) as f:
         lines = f.readline()  # One line is enough
         embed_dim = len(lines.strip().split()) - 1
     return embed_dim
@@ -202,7 +202,7 @@ def dict2json(obj: dict, save_path):
 
     # Attempt to write the dictionary to a JSON file
     try:
-        with open(save_path, 'w') as f:
+        with open(save_path, 'w', encoding=ENCODING) as f:
             json.dump(obj, f, indent=4, separators=(',', ': '))
     except IOError as e:
         # Handle the error (e.g., permission error, disk full)
