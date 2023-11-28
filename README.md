@@ -1,19 +1,21 @@
 # ukp_entrance_test
-Your task is to implement a simple sequence tagger using word embeddings for named entity recognition.
-The architecture must be a bidirectional LSTM with a single 100-dimensional hidden layer.
-Use following parameters for training:
-* Use Crossentropy-loss and the Adam optimizer
-* Train for 20 Epochs
-* Set the batch-size to 1
+## 1. Environment Installation
+### 1.1 Install python environment
+Install environment with conda:
+```bash
+git clone https://github.com/ututono/ukp_entrance_test.git
+conda env create -n nlp_mini python=3.11
+conda activate nlp_mini
+pip install -r requirements.txt 
+```
+Note that if you are using Windows, you might need to select suitable version of PyTorch from [its website](https://pytorch.org).
 
-The data is already split into a train, dev, and test set. The input tokens are specified in the first column and the labels are in last column.
+### 1.2 Create `.env` file to root directory
+The `.env` file should contain the following variables:
+```bash
+ROOT_PATH = <path to root directory>
+```
+Note that if you are using Windows, you should use double backslash `\\` instead of single backslash `\` in the path.
 
-The word embeddings are pretrained and should not be updated with the model. You can download them here:
-https://nextcloud.ukp.informatik.tu-darmstadt.de/index.php/s/g6xfciqqQbw99Xw
-
-Further requirements are:
-* Use PyTorch (not Keras or Tensorflow) to implement the model
-* Use python 3.6 or higher
-* Do not use any other libraries besides native python libraries, PyTorch, numpy, pandas, or matplotlib (if you want to provide any visualization). 
-* The resulting submission should be one (or several) python files. Do not submit a Jupyter notebook.
-* Report the macro-averaged F1 scores on the dev data (for all 20 epochs) and the macro-averaged F1 scores of the final model on the test data.
+## Usage
+### Train
