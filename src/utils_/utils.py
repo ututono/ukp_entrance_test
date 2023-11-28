@@ -260,16 +260,17 @@ def init_cm_result_dict():
     return cm_result
 
 
-def visualize_cm(key: str, cms_result: dict, save_path: str = None):
+def visualize_cm(key: str, cms_result: dict, title, save_path: str = None):
     """
     Visualize the confusion matrix result
+    :param title: str. The title of the plot
     :param key: str. The key of the confusion matrix result
     :param cms_result: dict. The confusion matrix result dictionary
     :return:
     """
-    fig, axs = plt.subplots(1, 1, figsize=(10, 10))
+    fig, axs = plt.subplots(1, 1)
     axs.plot(cms_result[key])
-    axs.set_title(f"{key} during training")
+    axs.set_title(title)
     axs.set_xlabel('Epoch')
     axs.set_ylabel(key)
     if save_path:
