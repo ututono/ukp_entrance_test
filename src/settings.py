@@ -12,7 +12,8 @@ def parse_arguments():
     parser.add_argument('--optimizer', type=str, default='adam', help='Optimizer')
     parser.add_argument('--loss', type=str, default='cross_entropy', help='Loss function')
     parser.add_argument('--mode', type=str, default='train', help='Mode: train or test')
-    parser.add_argument('--load_ckpt', type=str, default=None, help='Load model from checkpoint')
+    parser.add_argument('--checkpoint', type=str, default=None, help='Load model from checkpoint')
+    parser.add_argument('--num_samples', type=int, default=None, help='Number of samples to train/evaluate on')
 
 
 

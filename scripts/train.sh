@@ -29,4 +29,5 @@ python3 -m src.main \
   --learning_rate 0.001 \
   --optimizer adam \
   --loss cross_entropy \
+  --num_samples 900 \
   --mode train \

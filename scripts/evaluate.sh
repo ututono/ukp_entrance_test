@@ -27,5 +27,6 @@ cd $ROOT_PATH
 python3 -m src.main \
   --batch_size 1 \
   --loss cross_entropy \
-  --load_ckpt 2023_11_27-17_16_04 \
+  --checkpoint 2023_11_27-17_16_04 \
+  --num_samples 900 \
   --mode test \

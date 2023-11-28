@@ -26,6 +26,7 @@ def pipeline_train(train_params):
     loss_name = train_params["loss"]
     optimizer_name = train_params["optimizer"]
     epochs = train_params["epochs"]
+    num_samples = train_params["num_samples"]
 
     # Set random seed
     seed_random_generators(seed)
@@ -35,8 +36,8 @@ def pipeline_train(train_params):
     tags_size = data_processor.num_tags
 
     # Get dataloader
-    train_dataloader = data_processor.get_dataloader(TRAIN_FILENAME, 0)
-    dev_dataloader = data_processor.get_dataloader(DEV_FILENAME, 0)
+    train_dataloader = data_processor.get_dataloader(TRAIN_FILENAME, 0, num_samples)
+    dev_dataloader = data_processor.get_dataloader(DEV_FILENAME, 0, num_samples)
 
     # Get embedding layer
     embedding_dim = get_embedding_dim()
@@ -79,6 +80,7 @@ def pipeline_test(eval_params):
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     seed = eval_params["seed"]
     ckpt = eval_params["checkpoint"]
+    num_samples = eval_params["num_samples"]
 
     # Set random seed
     seed_random_generators(seed)
@@ -87,7 +89,7 @@ def pipeline_test(eval_params):
     data_processor = DataProcessor(os.path.join(root_path(), DATA_DIR_NAME), batch_size)
 
     # Get dataloader
-    test_dataloader = data_processor.get_dataloader(TEST_FILENAME, 0)
+    test_dataloader = data_processor.get_dataloader(TEST_FILENAME, 0, num_samples)
 
     # Get embedding layer
     embedding_dim = get_embedding_dim()
